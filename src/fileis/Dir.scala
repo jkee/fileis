@@ -28,7 +28,7 @@ class Dir(name: String)(
       this
     }
     else {
-      val newFiles = fileList.filter(file => nodes.exists(_.name == file.getName))
+      val newFiles = fileList.filter(file => !nodes.exists(_.name == file.getName))
       val newNodes = newFiles.map(FileNode.evaluateFileNode(_))
       val oldExisted: Array[FileNode] = nodes.filter(node => fileList.exists(node.name == _.getName))
       val nodesFull: Array[FileNode] = newNodes ++ oldExisted.map(_.update(makePath(path)))
