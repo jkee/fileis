@@ -1,4 +1,4 @@
-package filezealot
+package fileis
 
 import java.io.File
 

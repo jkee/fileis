@@ -1,4 +1,4 @@
-package filezealot
+package fileis
 
 /**
  * @author jkee
