@@ -1,6 +1,6 @@
 package fileis
 
-import java.io.File
+import java.io.{OutputStream, File}
 
 
 /**
@@ -16,6 +16,22 @@ abstract class FileNode(
   final def makePath(path: String): String = path + name
 
   def update(path: String):FileNode = this
+
+
+
+  final def printTo(stream: OutputStream) {
+    printTo(stream, 0)
+  }
+
+  def printTo(stream: OutputStream, level: Int) {
+    printTo(stream, level, "--")
+  }
+
+  protected def printTo(stream: OutputStream, level: Int, sign:String) {
+    stream.write((sign * level + name).getBytes)
+  }
+
+
 
 }
 
@@ -37,7 +53,8 @@ object FileNode {
 
   def main(args: Array[String]) {
     val time = System.currentTimeMillis()
-    println(buildFileTree("/home/jkee"))
+    val root = buildFileTree("D:\\студия")
+    root.printTo(System.out)
     println("Time: " + (System.currentTimeMillis() - time))
   }
 }

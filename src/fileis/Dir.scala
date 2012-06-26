@@ -1,6 +1,6 @@
 package fileis
 
-import java.io.File
+import java.io.{OutputStream, File}
 
 /**
  * @author jkee
@@ -22,6 +22,15 @@ class Dir(name: String)(
       val oldExisted: Array[FileNode] = nodes.filter(node => fileList.exists(node.name == _.getName))
       val nodesFull: Array[FileNode] = newNodes ++ oldExisted.map(_.update(makePath(path)))
       new Dir(name)(nodesFull)
+    }
+  }
+
+  override def printTo(stream: OutputStream, level: Int) {
+    super.printTo(stream, level, "++")
+
+    for (node <- nodes) {
+      stream.write('\n')
+      node.printTo(stream, level + 1)
     }
   }
 
