@@ -1,6 +1,9 @@
 package fileis
 
 import java.io.{ByteArrayOutputStream, OutputStream, File}
+import FileNode._
+import java.util
+import java.awt.image.DirectColorModel
 
 
 /**
@@ -8,8 +11,10 @@ import java.io.{ByteArrayOutputStream, OutputStream, File}
  */
 
 abstract class FileNode(
-                         val name:String
+                         sourceName:String
                          ) {
+
+  val name:String = if (sourceName.isEmpty) "/" else sourceName
 
   override def toString = {
     val stream = new ByteArrayOutputStream()
@@ -17,7 +22,7 @@ abstract class FileNode(
     new String(stream.toByteArray)
   }
 
-  final def makePath(path: String): String = path + name
+  final def makePath(path: String): String = if (path == null) name else path + name
 
   def update(path: String):FileNode = this
 
@@ -50,6 +55,7 @@ object FileNode {
 
   def evaluateFileNode(file: File): FileNode = {
     if (!file.isDirectory) new FileLeaf(file.getName)
+    else if (isSymlink(file)) new SymLink(file.getName)
     else new Dir(file.getName)(fileArray(file))
   }
 
@@ -64,4 +70,29 @@ object FileNode {
     //root.printTo(System.out); println()
     println("Time: " + (System.currentTimeMillis() - time))
   }
+
+  def bfsSearch(root: FileNode, predicate: FileNode => Boolean): FileNode = {
+    val fifo = new util.ArrayDeque[FileNode]()
+    var currentFile = root
+    while(currentFile != null && !predicate(currentFile)) {
+      currentFile match {
+        case currentFile:Dir => currentFile.nodes.foreach(fifo.offer(_))
+        case _ =>
+      }
+      if (fifo.isEmpty) currentFile = null
+      else currentFile = fifo.poll()
+    }
+    currentFile
+  }
+
+  //Apache commons
+  def isSymlink(file: File):Boolean = {
+    if (file == null) throw new NullPointerException
+    val canon:File = {
+      if (file.getParent == null) file
+      else new File(file.getParentFile.getCanonicalFile, file.getName)
+    }
+    !canon.getCanonicalFile.equals(canon.getAbsoluteFile)
+  }
+
 }

@@ -1,14 +1,15 @@
 package fileis
 
 import java.io.{ByteArrayOutputStream, OutputStream, File}
+import FileNode._
 
 /**
  * @author jkee
  */
 
-class Dir(name: String)(
+class Dir(sourceName: String)(
            val nodes: Array[FileNode]
-           ) extends FileNode(name) {
+           ) extends FileNode(sourceName) {
 
   override def toString = {
     val stream = new ByteArrayOutputStream()
@@ -17,8 +18,8 @@ class Dir(name: String)(
   }
 
   override def update(path: String): FileNode = {
-    if (!isDirectoryReal(path)) new FileLeaf(name)
-    val fileList = FileNode.listFiles(path, name)
+    if (path != null && !isDirectoryReal(path)) new FileLeaf(name)
+    val fileList = listFiles(path, name)
     if (fileList == null) {
       if (nodes.isEmpty) this
       else new Dir(name)(Array())
@@ -29,7 +30,7 @@ class Dir(name: String)(
     }
     else {
       val newFiles = fileList.filter(file => !nodes.exists(_.name == file.getName))
-      val newNodes = newFiles.map(FileNode.evaluateFileNode(_))
+      val newNodes = newFiles.map(evaluateFileNode(_))
       val oldExisted: Array[FileNode] = nodes.filter(node => fileList.exists(node.name == _.getName))
       val nodesFull: Array[FileNode] = newNodes ++ oldExisted.map(_.update(makePath(path)))
       new Dir(name)(nodesFull)
