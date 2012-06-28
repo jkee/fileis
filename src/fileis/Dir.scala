@@ -8,7 +8,7 @@ import FileNode._
  */
 
 class Dir(sourceName: String)(
-           val nodes: Array[FileNode]
+           var nodes: Array[FileNode]
            ) extends FileNode(sourceName) {
 
   override def toString = {
@@ -25,12 +25,12 @@ class Dir(sourceName: String)(
       else new Dir(name)(Array())
     }
     else if (fileList.length == nodes.length && nodes.forall(node => fileList.exists(_.getName == node.name)) ) {
-      for (node <- nodes) node.update(makePath(path))
+      nodes = nodes.map(_.update(makePath(path)))
       this
     }
     else {
       val newFiles = fileList.filter(file => !nodes.exists(_.name == file.getName))
-      val newNodes = newFiles.map(evaluateFileNode(_))
+      val newNodes = newFiles.map(evaluateFileNode(_)
       val oldExisted: Array[FileNode] = nodes.filter(node => fileList.exists(node.name == _.getName))
       val nodesFull: Array[FileNode] = newNodes ++ oldExisted.map(_.update(makePath(path)))
       new Dir(name)(nodesFull)

@@ -22,7 +22,7 @@ abstract class FileNode(
     new String(stream.toByteArray)
   }
 
-  final def makePath(path: String): String = if (path == null) name else path + name
+  final def makePath(path: String): String = if (path == null) name else path + "/" + name
 
   def update(path: String):FileNode = this
 
